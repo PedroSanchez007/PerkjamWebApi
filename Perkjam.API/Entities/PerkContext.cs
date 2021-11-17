@@ -5,7 +5,7 @@ namespace Perkjam.API.Entities
 {
   public class PerkContext : DbContext
   {
-    public PerkContext(DbContextOptions<GalleryContext> options)
+    public PerkContext(DbContextOptions<PerkContext> options)
         : base(options)
     {
     }

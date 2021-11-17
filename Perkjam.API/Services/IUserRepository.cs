@@ -10,6 +10,7 @@ namespace Perkjam.API.Services
     User GetUser(int id);
     User GetUser(string email);
     void AddUser(User user);
+    void UpdateUser(User user);
     void DeleteUser(User user);
     bool Save();
   }

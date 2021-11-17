@@ -49,6 +49,10 @@ namespace Perkjam.API.Services
             _context.Users.Add(user);
         }
 
+        public void UpdateUser(User user)
+        {
+            _context.Users.Update(user);
+        }
 
         public void DeleteUser(User user)
         {

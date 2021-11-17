@@ -98,14 +98,15 @@ namespace Perkjam.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateUser(int id, UserForCreation userModel)
+        public IActionResult UpdateUser(int id, UserForUpdate userForUpdate)
         {
             try
             {
                 var userFromRepo = _repository.GetUser(id);
                 if (userFromRepo == null) return NotFound();
 
-                _mapper.Map(userModel, userFromRepo);
+                _mapper.Map(userForUpdate, userFromRepo);
+                _repository.UpdateUser(userFromRepo);
 
                 if (_repository.Save())
                 {
