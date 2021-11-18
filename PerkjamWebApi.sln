@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkjam.Client", "Perkjam.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perkjam.Model", "Perkjam.Model\Perkjam.Model.csproj", "{D4C12D20-238D-4666-B2EB-EC9A0E805FFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perkjam.IDP", "Perkjam.IDP\Perkjam.IDP.csproj", "{CC511F3D-0919-4573-8C56-340028567268}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D4C12D20-238D-4666-B2EB-EC9A0E805FFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4C12D20-238D-4666-B2EB-EC9A0E805FFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4C12D20-238D-4666-B2EB-EC9A0E805FFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC511F3D-0919-4573-8C56-340028567268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC511F3D-0919-4573-8C56-340028567268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC511F3D-0919-4573-8C56-340028567268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC511F3D-0919-4573-8C56-340028567268}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
