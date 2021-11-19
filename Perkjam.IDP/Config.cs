@@ -10,26 +10,24 @@ namespace Perkjam.IDP
 {
     public static class Config
     {
-        public static IEnumerable<IdentityResource> IdentityResources =>
+        public static IEnumerable<IdentityResource> Ids =>
             new IdentityResource[]
             { 
                 new IdentityResources.OpenId(),
-                new IdentityResources.Profile(),
-                new IdentityResources.Address(),
-                new IdentityResource("roles", "Your role(s)", new List<string> { "role"})
+                new IdentityResources.Profile()
             };
 
-        public static IEnumerable<ApiScope> ApiScopes =>
-            new ApiScope[]
+        public static IEnumerable<ApiResource> Apis =>
+            new ApiResource[] 
             { };
-
+        
         public static IEnumerable<Client> Clients =>
             new Client[] 
-            {
+            { 
                 new Client
                 {
-                    ClientName = "UsersWebApp",
-                    ClientId = "userswebclient",
+                    ClientName = "Image Gallery", 
+                    ClientId = "imagegalleryclient",
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     RedirectUris = new List<string>()
@@ -40,18 +38,15 @@ namespace Perkjam.IDP
                     {
                         "https://localhost:44389/signout-callback-oidc"
                     },
-                    AllowedScopes =
+                    AllowedScopes = 
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile,
-                        IdentityServerConstants.StandardScopes.Address,
-                        "roles"
+                        IdentityServerConstants.StandardScopes.Profile
                     },
                     ClientSecrets =
                     {
                         new Secret("secret".Sha256())
                     }
-                }
-            };
+                } };        
     }
 }

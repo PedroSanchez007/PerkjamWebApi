@@ -2,18 +2,17 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
-using IdentityServer4.Validation;
+using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Perkjam.IDP.Quickstart.Account;
 
 namespace Perkjam.IDP.Quickstart.Consent
 {
@@ -25,15 +24,21 @@ namespace Perkjam.IDP.Quickstart.Consent
     public class ConsentController : Controller
     {
         private readonly IIdentityServerInteractionService _interaction;
+        private readonly IClientStore _clientStore;
+        private readonly IResourceStore _resourceStore;
         private readonly IEventService _events;
         private readonly ILogger<ConsentController> _logger;
 
         public ConsentController(
             IIdentityServerInteractionService interaction,
+            IClientStore clientStore,
+            IResourceStore resourceStore,
             IEventService events,
             ILogger<ConsentController> logger)
         {
             _interaction = interaction;
+            _clientStore = clientStore;
+            _resourceStore = resourceStore;
             _events = events;
             _logger = logger;
         }
@@ -66,12 +71,11 @@ namespace Perkjam.IDP.Quickstart.Consent
 
             if (result.IsRedirect)
             {
-                var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
-                if (context?.IsNativeClient() == true)
+                if (await _clientStore.IsPkceClientAsync(result.ClientId))
                 {
-                    // The client is native, so this change in how to
+                    // if the client is PKCE then we assume it's native, so this change in how to
                     // return the response is for better UX for the end user.
-                    return this.LoadingPage("Redirect", result.RedirectUri);
+                    return View("Redirect", new RedirectViewModel { RedirectUrl = result.RedirectUri });
                 }
 
                 return Redirect(result.RedirectUri);
@@ -106,10 +110,10 @@ namespace Perkjam.IDP.Quickstart.Consent
             // user clicked 'no' - send back the standard 'access_denied' response
             if (model?.Button == "no")
             {
-                grantedConsent = new ConsentResponse { Error = AuthorizationError.AccessDenied };
+                grantedConsent = ConsentResponse.Denied;
 
                 // emit event
-                await _events.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues));
+                await _events.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.ClientId, request.ScopesRequested));
             }
             // user clicked 'yes' - validate the data
             else if (model?.Button == "yes")
@@ -126,12 +130,11 @@ namespace Perkjam.IDP.Quickstart.Consent
                     grantedConsent = new ConsentResponse
                     {
                         RememberConsent = model.RememberConsent,
-                        ScopesValuesConsented = scopes.ToArray(),
-                        Description = model.Description
+                        ScopesConsented = scopes.ToArray()
                     };
 
                     // emit event
-                    await _events.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues, grantedConsent.ScopesValuesConsented, grantedConsent.RememberConsent));
+                    await _events.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.ClientId, request.ScopesRequested, grantedConsent.ScopesConsented, grantedConsent.RememberConsent));
                 }
                 else
                 {
@@ -150,7 +153,7 @@ namespace Perkjam.IDP.Quickstart.Consent
 
                 // indicate that's it ok to redirect back to authorization endpoint
                 result.RedirectUri = model.ReturnUrl;
-                result.Client = request.Client;
+                result.ClientId = request.ClientId;
             }
             else
             {
@@ -166,7 +169,23 @@ namespace Perkjam.IDP.Quickstart.Consent
             var request = await _interaction.GetAuthorizationContextAsync(returnUrl);
             if (request != null)
             {
-                return CreateConsentViewModel(model, returnUrl, request);
+                var client = await _clientStore.FindEnabledClientByIdAsync(request.ClientId);
+                if (client != null)
+                {
+                    var resources = await _resourceStore.FindEnabledResourcesByScopeAsync(request.ScopesRequested);
+                    if (resources != null && (resources.IdentityResources.Any() || resources.ApiResources.Any()))
+                    {
+                        return CreateConsentViewModel(model, returnUrl, request, client, resources);
+                    }
+                    else
+                    {
+                        _logger.LogError("No scopes matching: {0}", request.ScopesRequested.Aggregate((x, y) => x + ", " + y));
+                    }
+                }
+                else
+                {
+                    _logger.LogError("Invalid client id: {0}", request.ClientId);
+                }
             }
             else
             {
@@ -178,39 +197,30 @@ namespace Perkjam.IDP.Quickstart.Consent
 
         private ConsentViewModel CreateConsentViewModel(
             ConsentInputModel model, string returnUrl,
-            AuthorizationRequest request)
+            AuthorizationRequest request,
+            Client client, Resources resources)
         {
             var vm = new ConsentViewModel
             {
                 RememberConsent = model?.RememberConsent ?? true,
                 ScopesConsented = model?.ScopesConsented ?? Enumerable.Empty<string>(),
-                Description = model?.Description,
 
                 ReturnUrl = returnUrl,
 
-                ClientName = request.Client.ClientName ?? request.Client.ClientId,
-                ClientUrl = request.Client.ClientUri,
-                ClientLogoUrl = request.Client.LogoUri,
-                AllowRememberConsent = request.Client.AllowRememberConsent
+                ClientName = client.ClientName ?? client.ClientId,
+                ClientUrl = client.ClientUri,
+                ClientLogoUrl = client.LogoUri,
+                AllowRememberConsent = client.AllowRememberConsent
             };
 
-            vm.IdentityScopes = request.ValidatedResources.Resources.IdentityResources.Select(x => CreateScopeViewModel(x, vm.ScopesConsented.Contains(x.Name) || model == null)).ToArray();
-
-            var apiScopes = new List<ScopeViewModel>();
-            foreach(var parsedScope in request.ValidatedResources.ParsedScopes)
+            vm.IdentityScopes = resources.IdentityResources.Select(x => CreateScopeViewModel(x, vm.ScopesConsented.Contains(x.Name) || model == null)).ToArray();
+            vm.ResourceScopes = resources.ApiResources.SelectMany(x => x.Scopes).Select(x => CreateScopeViewModel(x, vm.ScopesConsented.Contains(x.Name) || model == null)).ToArray();
+            if (ConsentOptions.EnableOfflineAccess && resources.OfflineAccess)
             {
-                var apiScope = request.ValidatedResources.Resources.FindApiScope(parsedScope.ParsedName);
-                if (apiScope != null)
-                {
-                    var scopeVm = CreateScopeViewModel(parsedScope, apiScope, vm.ScopesConsented.Contains(parsedScope.RawValue) || model == null);
-                    apiScopes.Add(scopeVm);
-                }
+                vm.ResourceScopes = vm.ResourceScopes.Union(new ScopeViewModel[] {
+                    GetOfflineAccessScope(vm.ScopesConsented.Contains(IdentityServer4.IdentityServerConstants.StandardScopes.OfflineAccess) || model == null)
+                });
             }
-            if (ConsentOptions.EnableOfflineAccess && request.ValidatedResources.Resources.OfflineAccess)
-            {
-                apiScopes.Add(GetOfflineAccessScope(vm.ScopesConsented.Contains(IdentityServer4.IdentityServerConstants.StandardScopes.OfflineAccess) || model == null));
-            }
-            vm.ApiScopes = apiScopes;
 
             return vm;
         }
@@ -219,8 +229,8 @@ namespace Perkjam.IDP.Quickstart.Consent
         {
             return new ScopeViewModel
             {
-                Value = identity.Name,
-                DisplayName = identity.DisplayName ?? identity.Name,
+                Name = identity.Name,
+                DisplayName = identity.DisplayName,
                 Description = identity.Description,
                 Emphasize = identity.Emphasize,
                 Required = identity.Required,
@@ -228,22 +238,16 @@ namespace Perkjam.IDP.Quickstart.Consent
             };
         }
 
-        public ScopeViewModel CreateScopeViewModel(ParsedScopeValue parsedScopeValue, ApiScope apiScope, bool check)
+        public ScopeViewModel CreateScopeViewModel(Scope scope, bool check)
         {
-            var displayName = apiScope.DisplayName ?? apiScope.Name;
-            if (!String.IsNullOrWhiteSpace(parsedScopeValue.ParsedParameter))
-            {
-                displayName += ":" + parsedScopeValue.ParsedParameter;
-            }
-
             return new ScopeViewModel
             {
-                Value = parsedScopeValue.RawValue,
-                DisplayName = displayName,
-                Description = apiScope.Description,
-                Emphasize = apiScope.Emphasize,
-                Required = apiScope.Required,
-                Checked = check || apiScope.Required
+                Name = scope.Name,
+                DisplayName = scope.DisplayName,
+                Description = scope.Description,
+                Emphasize = scope.Emphasize,
+                Required = scope.Required,
+                Checked = check || scope.Required
             };
         }
 
@@ -251,7 +255,7 @@ namespace Perkjam.IDP.Quickstart.Consent
         {
             return new ScopeViewModel
             {
-                Value = IdentityServer4.IdentityServerConstants.StandardScopes.OfflineAccess,
+                Name = IdentityServer4.IdentityServerConstants.StandardScopes.OfflineAccess,
                 DisplayName = ConsentOptions.OfflineAccessDisplayName,
                 Description = ConsentOptions.OfflineAccessDescription,
                 Emphasize = true,

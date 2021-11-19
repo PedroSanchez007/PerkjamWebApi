@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using Perkjam.IDP;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,13 +25,9 @@ namespace Perkjam.IDP
             // uncomment, if you want to add an MVC-based UI
             services.AddControllersWithViews();
 
-            var builder = services.AddIdentityServer(options =>
-            {
-                // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
-                options.EmitStaticAudienceClaim = true;
-            })
-                .AddInMemoryIdentityResources(Config.IdentityResources)
-                .AddInMemoryApiScopes(Config.ApiScopes)
+            var builder = services.AddIdentityServer()
+                .AddInMemoryIdentityResources(Config.Ids)
+                .AddInMemoryApiResources(Config.Apis)
                 .AddInMemoryClients(Config.Clients)
                 .AddTestUsers(TestUsers.Users);
 
@@ -48,7 +45,7 @@ namespace Perkjam.IDP
             // uncomment if you want to add MVC
             app.UseStaticFiles();
             app.UseRouting();
-            
+
             app.UseIdentityServer();
 
             // uncomment, if you want to add MVC
