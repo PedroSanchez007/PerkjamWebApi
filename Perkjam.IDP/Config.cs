@@ -14,20 +14,30 @@ namespace Perkjam.IDP
             new IdentityResource[]
             { 
                 new IdentityResources.OpenId(),
-                new IdentityResources.Profile()
+                new IdentityResources.Profile(),
+                new IdentityResources.Address(),
+                new IdentityResource(
+                    "roles",
+                    "Your role(s)",
+                    new List<string>() { "role" })
             };
 
         public static IEnumerable<ApiResource> Apis =>
             new ApiResource[] 
-            { };
+            {
+                new ApiResource(
+                    "perkjamapi", 
+                    "Perkjam API",
+                    new List<string>() { "role" })
+            };
         
         public static IEnumerable<Client> Clients =>
             new Client[] 
             { 
                 new Client
                 {
-                    ClientName = "Image Gallery", 
-                    ClientId = "imagegalleryclient",
+                    ClientName = "Perkjam", 
+                    ClientId = "perkjamclient",
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     RedirectUris = new List<string>()
@@ -41,7 +51,10 @@ namespace Perkjam.IDP
                     AllowedScopes = 
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Address,
+                        "roles",
+                        "perkjamapi"
                     },
                     ClientSecrets =
                     {

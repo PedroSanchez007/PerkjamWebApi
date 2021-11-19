@@ -15,7 +15,7 @@
       },
       "applicationUrl": "https://localhost:44366/"
     },
-    "ImageGallery.API": {
+    "Perkjam.API": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "http://localhost:5000",

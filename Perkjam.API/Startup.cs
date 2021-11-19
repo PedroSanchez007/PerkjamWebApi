@@ -1,7 +1,8 @@
 using AutoMapper;
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Builder;
 using Perkjam.API.Entities;
 using Perkjam.API.Services;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -16,19 +17,25 @@ namespace Perkjam.API
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
-
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                    .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "Perkjam.API", Version = "v1" }); });
+                     .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
+
+            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = "https://localhost:44318";
+                    options.ApiName = "perkjamapi";
+                });
 
             // register the DbContext on the container, getting the connection string from
             // appSettings (note: use this during development; in a production environment,
@@ -44,6 +51,7 @@ namespace Perkjam.API
 
             // register AutoMapper-related services
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,8 +60,6 @@ namespace Perkjam.API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Perkjam.API v1"));
             }
             else
             {
@@ -77,9 +83,14 @@ namespace Perkjam.API
 
             app.UseRouting();
 
-            //app.UseAuthorization();
+            app.UseAuthentication();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

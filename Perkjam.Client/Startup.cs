@@ -63,7 +63,7 @@ namespace Perkjam.Client
                 {
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.Authority = "https://localhost:44318/";
-                    options.ClientId = "userswebclient";
+                    options.ClientId = "perkjamclient";
                     options.ResponseType = "code";
                     options.Scope.Add("address");
                     options.Scope.Add("roles");
