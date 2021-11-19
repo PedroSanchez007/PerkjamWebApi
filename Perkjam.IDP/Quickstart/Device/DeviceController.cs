@@ -16,8 +16,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Perkjam.IDP.Quickstart.Consent;
 
-namespace IdentityServerHost.Quickstart.UI
+namespace Perkjam.IDP.Quickstart.Device
 {
     [Authorize]
     [SecurityHeaders]

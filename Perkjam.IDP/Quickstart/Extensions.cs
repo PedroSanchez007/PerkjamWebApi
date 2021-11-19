@@ -1,8 +1,9 @@
 using System;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
+using Perkjam.IDP.Quickstart.Account;
 
-namespace IdentityServerHost.Quickstart.UI
+namespace Perkjam.IDP.Quickstart
 {
     public static class Extensions
     {

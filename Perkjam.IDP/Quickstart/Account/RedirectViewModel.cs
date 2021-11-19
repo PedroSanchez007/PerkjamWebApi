@@ -3,7 +3,7 @@
 
 
 
-namespace IdentityServerHost.Quickstart.UI
+namespace Perkjam.IDP.Quickstart.Account
 {
     public class RedirectViewModel
     {

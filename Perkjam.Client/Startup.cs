@@ -35,7 +35,7 @@ namespace Perkjam.Client
             // create an HttpClient used for accessing the API
             services.AddHttpClient("APIClient", client =>
             {
-                client.BaseAddress = new Uri("https://localhost:44341/");
+                client.BaseAddress = new Uri("https://localhost:44366/");
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
             });
@@ -43,7 +43,7 @@ namespace Perkjam.Client
             // create an HttpClient used for accessing the IDP
             services.AddHttpClient("IDPClient", client =>
             {
-                client.BaseAddress = new Uri("https://localhost:5051/");
+                client.BaseAddress = new Uri("https://localhost:44318/");
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
             });
@@ -57,7 +57,7 @@ namespace Perkjam.Client
                 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                 {
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.Authority = "https://localhost:5051/";
+                    options.Authority = "https://localhost:44318/";
                     options.ClientId = "userswebclient";
                     options.ResponseType = "code";
                     options.Scope.Add("address");

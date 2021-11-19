@@ -34,11 +34,11 @@ namespace Perkjam.IDP
                     RequirePkce = true,
                     RedirectUris = new List<string>()
                     {
-                        "https://localhost:44326/signin-oidc"
+                        "https://localhost:44389/signin-oidc"
                     },
                     PostLogoutRedirectUris = new List<string>()
                     {
-                        "https://localhost:44326/signout-callback-oidc"
+                        "https://localhost:44389/signout-callback-oidc"
                     },
                     AllowedScopes =
                     {
