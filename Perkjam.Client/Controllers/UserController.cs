@@ -40,12 +40,18 @@ namespace Perkjam.Client.Controllers
 
             var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
-            response.EnsureSuccessStatusCode();
-
-            using (var responseStream = await response.Content.ReadAsStreamAsync())
+            if (response.IsSuccessStatusCode)
             {
+                await using var responseStream = await response.Content.ReadAsStreamAsync();
                 return View(new PerkIndexViewModel(await JsonSerializer.DeserializeAsync<List<User>>(responseStream)));
             }
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+                     response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                return RedirectToAction("AccessDenied", "Authorization");
+            }
+
+            throw new Exception("Problem accessing the API");  
         }
 
         public async Task Logout()
@@ -54,7 +60,7 @@ namespace Perkjam.Client.Controllers
             await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         }
 
-        [Authorize(Roles = "PayingUser")]
+        //[Authorize(Roles = "PayingUser")]
         public async Task<IActionResult> GetAddressFromIDP()
         {
             var idpClient = _httpClientFactory.CreateClient("IDPClient");

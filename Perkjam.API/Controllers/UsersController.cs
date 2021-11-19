@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Perkjam.API.Controllers
 {
     [Route("api/users")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repository;
@@ -66,6 +68,7 @@ namespace Perkjam.API.Controllers
         }
 
         [HttpPost()]
+        //[Authorize(Roles = "PayingUser")]
         public IActionResult CreateUser([FromBody] UserForCreation userForCreation)
         {
             try
