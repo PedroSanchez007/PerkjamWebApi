@@ -60,7 +60,7 @@ namespace Perkjam.Client.Controllers
             await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         }
 
-        //[Authorize(Roles = "PayingUser")]
+        [Authorize(Roles = "PayingUser")]
         public async Task<IActionResult> GetAddressFromIDP()
         {
             var idpClient = _httpClientFactory.CreateClient("IDPClient");

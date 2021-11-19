@@ -68,7 +68,7 @@ namespace Perkjam.API.Controllers
         }
 
         [HttpPost()]
-        //[Authorize(Roles = "PayingUser")]
+        [Authorize(Roles = "PayingUser")]
         public IActionResult CreateUser([FromBody] UserForCreation userForCreation)
         {
             try
