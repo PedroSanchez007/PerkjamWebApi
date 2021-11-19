@@ -7,9 +7,6 @@ namespace Perkjam.Client.ViewModels
     public class AddUserViewModel
     {
         [Required]
-        public int Id { get; set; }
-
-        [Required]
         public string Name { get; set; }
 
         [Required]

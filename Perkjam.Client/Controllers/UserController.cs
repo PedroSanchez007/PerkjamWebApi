@@ -54,12 +54,6 @@ namespace Perkjam.Client.Controllers
             throw new Exception("Problem accessing the API");  
         }
 
-        public async Task Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
-        }
-
         [Authorize(Roles = "PayingUser")]
         public async Task<IActionResult> GetAddressFromIDP()
         {
@@ -89,6 +83,74 @@ namespace Perkjam.Client.Controllers
             var address = userInfoResponse.Claims.FirstOrDefault(c => c.Type == "address")?.Value;
 
             return View(new GetAddressFromIDPViewModel(address));
+        }
+        
+        [Authorize(Roles = "PayingUser")]
+        public IActionResult AddUser()
+        {
+            return View();
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "PayingUser")]
+        public async Task<IActionResult> AddUser(AddUserViewModel addUserViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                RedirectToAction("Index");
+            }
+
+            // create an UserForCreation instance
+            var userForCreation = new UserForCreation()
+            {
+                Name = addUserViewModel.Name,
+                Email = addUserViewModel.Email
+            };
+
+            // serialize it
+            var serializedUserForCreation = JsonSerializer.Serialize(userForCreation);  
+            
+            var httpClient = _httpClientFactory.CreateClient("APIClient");
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                $"/api/users");
+
+            request.Content = new StringContent(
+                serializedUserForCreation,
+                System.Text.Encoding.Unicode,
+                "application/json");
+
+            var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+
+            return RedirectToAction("Index");
+        }
+        
+        [HttpDelete]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "PayingUser")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var httpClient = _httpClientFactory.CreateClient("APIClient");
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Delete,
+                $"/api/users/{id}");
+
+            var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+
+            return RedirectToAction("Index");
+        }
+        
+        public async Task Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         }
 
         public async Task WriteOutIdentityInformation()
