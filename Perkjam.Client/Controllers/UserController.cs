@@ -85,7 +85,7 @@ namespace Perkjam.Client.Controllers
             return View(new GetAddressFromIDPViewModel(address));
         }
         
-        [Authorize(Roles = "PayingUser")]
+        [Authorize(Policy = "CanAddUser")]
         public IActionResult AddUser()
         {
             return View();
@@ -93,7 +93,7 @@ namespace Perkjam.Client.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "PayingUser")]
+        [Authorize(Policy = "CanAddUser")]
         public async Task<IActionResult> AddUser(AddUserViewModel addUserViewModel)
         {
             if (!ModelState.IsValid)

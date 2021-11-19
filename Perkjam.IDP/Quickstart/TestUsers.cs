@@ -23,7 +23,9 @@ namespace Perkjam.IDP.Quickstart
                      new Claim("given_name", "Frank"),
                      new Claim("family_name", "Underwood"),
                      new Claim("address", "Main Road 1"),
-                     new Claim("role", "FreeUser")
+                     new Claim("role", "FreeUser"),
+                     new Claim("subscriptionlevel", "FreeUser"),
+                     new Claim("country", "nl")
                  }
              },
              new TestUser
@@ -37,7 +39,9 @@ namespace Perkjam.IDP.Quickstart
                      new Claim("given_name", "Claire"),
                      new Claim("family_name", "Underwood"),
                      new Claim("address", "Big Street 2"),
-                     new Claim("role", "PayingUser")
+                     new Claim("role", "PayingUser"),
+                     new Claim("subscriptionlevel", "PayingUser"),
+                     new Claim("country", "be")
                  }
              }
          };
