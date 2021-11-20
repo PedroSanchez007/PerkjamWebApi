@@ -37,6 +37,9 @@ namespace Perkjam.IDP
                     "perkjamapi", 
                     "Perkjam API",
                     new List<string>() { "role" })
+                {
+                    ApiSecrets = {new Secret("apisecret".Sha256())}
+                }
             };
         
         public static IEnumerable<Client> Clients =>
@@ -44,6 +47,7 @@ namespace Perkjam.IDP
             { 
                 new Client
                 {
+                    AccessTokenType = AccessTokenType.Reference,
                     AccessTokenLifetime = 120,
                     AllowOfflineAccess = true,
                     UpdateAccessTokenClaimsOnRefresh = true,

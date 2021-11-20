@@ -35,6 +35,7 @@ namespace Perkjam.API
                 {
                     options.Authority = "https://localhost:44318";
                     options.ApiName = "perkjamapi";
+                    options.ApiSecret = "apisecret";
                 });
 
             // register the DbContext on the container, getting the connection string from
