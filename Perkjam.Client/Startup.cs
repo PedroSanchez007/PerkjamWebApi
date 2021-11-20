@@ -84,6 +84,7 @@ namespace Perkjam.Client
                 options.Scope.Add("perkjamapi");
                 options.Scope.Add("subscriptionlevel");
                 options.Scope.Add("country");
+                options.Scope.Add("offline_access");
                 options.ClaimActions.DeleteClaim("sid");
                 options.ClaimActions.DeleteClaim("idp");
                 options.ClaimActions.DeleteClaim("s_hash");

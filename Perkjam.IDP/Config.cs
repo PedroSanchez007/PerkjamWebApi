@@ -44,6 +44,9 @@ namespace Perkjam.IDP
             { 
                 new Client
                 {
+                    AccessTokenLifetime = 120,
+                    AllowOfflineAccess = true,
+                    UpdateAccessTokenClaimsOnRefresh = true,
                     ClientName = "Perkjam", 
                     ClientId = "perkjamclient",
                     AllowedGrantTypes = GrantTypes.Code,
