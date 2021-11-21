@@ -12,7 +12,6 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using IdentityModel;
 using Perkjam.Client.HttpHandlers;
-using Perkjam.Client.HttpHandlers;
 
 namespace Perkjam.Client
 {
