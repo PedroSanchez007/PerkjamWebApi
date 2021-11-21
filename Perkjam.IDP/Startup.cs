@@ -4,7 +4,6 @@
 
 using System;
 using System.Security.Cryptography.X509Certificates;
-using Perkjam.IDP;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +32,8 @@ namespace Perkjam.IDP
                 .AddInMemoryClients(Config.Clients)
                 .AddTestUsers(TestUsers.Users);
 
-            builder.AddSigningCredential(LoadCertificateFromStore());
+            builder.AddDeveloperSigningCredential();
+            //builder.AddSigningCredential(LoadCertificateFromStore());
         }
 
         public void Configure(IApplicationBuilder app)
@@ -59,7 +59,7 @@ namespace Perkjam.IDP
         
         public X509Certificate2 LoadCertificateFromStore()
         {
-            var thumbPrint = "ddb398e3871e89b4b55010222d53d8305eaa7fbf";
+            var thumbPrint = "30f4330715891dc4fa8bc9b6565925f1e2095b5e";
 
             using var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
             store.Open(OpenFlags.ReadOnly);
