@@ -1,0 +1,17 @@
+﻿@model Perkjam.Client.ViewModels.PerkIndexViewModel
+
+<div class="bottomMarginDefault">
+</div>
+
+<div class="container">
+    @foreach (var item in Model.Users)
+    {
+        <div class="pull-left col-md-4">
+            <div>
+                <div class="h5">@item.Id</div>
+                <div class="h5">@item.Name</div>
+                <div class="h5">@item.Email</div>
+            </div>
+        </div>
+    }
+</div>
