@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Perkjam.API.Entities;
 using Perkjam.API.Services;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,8 +38,7 @@ namespace Perkjam.API
             // it's better to store the connection string in an environment variable)
             services.AddDbContext<PerkContext>(options =>
             {
-                options.UseSqlServer(
-                    Configuration["ConnectionStrings:PerkjamDBConnectionString"]);
+                options.UseSqlServer(Configuration["ConnectionStrings:PerkjamDBConnectionString"]);
             });
 
             // register the repository
@@ -48,7 +46,6 @@ namespace Perkjam.API
 
             // register AutoMapper-related services
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

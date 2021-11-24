@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Perkjam.API.Entities;
+﻿using Perkjam.API.Entities;
 
 namespace Perkjam.API.Services
 {

@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Perkjam.API.Entities;
+using Serilog;
 
 namespace Perkjam.API
 {
@@ -17,7 +12,11 @@ namespace Perkjam.API
     {
         public static void Main(string[] args)
         {
+            ConfigureLogger();
+            
             var host = BuildWebHost(args);
+            
+            Log.Information("Web Host built");
 
             // migrate & seed the database.  Best practice = in Main, using service scope
             using (var scope = host.Services.CreateScope())
@@ -30,8 +29,7 @@ namespace Perkjam.API
                 }
                 catch (Exception ex)
                 {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+                    Log.Error(ex, "An error occurred while migrating or seeding the database.");
                 }
             }
 
@@ -43,5 +41,13 @@ namespace Perkjam.API
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .Build();
+        
+        private static void ConfigureLogger()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .CreateLogger();
+        }
     }
 }

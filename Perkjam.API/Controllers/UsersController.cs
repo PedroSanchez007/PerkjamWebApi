@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Microsoft.AspNetCore.Authorization;
+using Serilog;
 
 namespace Perkjam.API.Controllers
 {
@@ -15,7 +15,6 @@ namespace Perkjam.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repository;
-        private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IMapper _mapper;
 
         public UsersController(
@@ -23,15 +22,11 @@ namespace Perkjam.API.Controllers
             IWebHostEnvironment hostingEnvironment,
             IMapper mapper)
         {
-            _repository = repository ?? 
-                                 throw new ArgumentNullException(nameof(repository));
-            _hostingEnvironment = hostingEnvironment ?? 
-                                  throw new ArgumentNullException(nameof(hostingEnvironment));
-            _mapper = mapper ?? 
-                      throw new ArgumentNullException(nameof(mapper));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet()]
         public IActionResult GetUsers()
         {
@@ -46,12 +41,12 @@ namespace Perkjam.API.Controllers
             }
             catch (Exception ex)
             {
-                // TODO Add Logging
+                Log.Error(ex, "Error calling GetUsers");
                 return StatusCode(500, ex);
             }
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("{id:int}", Name = "GetUser")]
         public IActionResult GetUser(int id)
         {
@@ -64,11 +59,12 @@ namespace Perkjam.API.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Error calling GetUser");
                 return StatusCode(500, ex);
             }
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost()]
         public IActionResult CreateUser([FromBody] UserForCreation userForCreation)
         {
@@ -95,13 +91,14 @@ namespace Perkjam.API.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Error calling CreateUser");
                 return StatusCode(500, ex);
             }
 
             return BadRequest(ModelState);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPut("{id}")]
         public IActionResult UpdateUser(int id, UserForUpdate userForUpdate)
         {
@@ -124,11 +121,12 @@ namespace Perkjam.API.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Error calling UpdateUser");
                 return StatusCode(500, ex);
             }
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
@@ -150,6 +148,7 @@ namespace Perkjam.API.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Error calling Delete");
                 return StatusCode(500, ex);
             }
         }
