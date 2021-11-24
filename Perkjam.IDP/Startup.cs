@@ -1,36 +1,36 @@
 ﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
-using Perkjam.IDP;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Logging;
 using Perkjam.IDP.Quickstart;
+using Microsoft.Extensions.Configuration;
 
 namespace Perkjam.IDP
 {
     public class Startup
     {
         public IWebHostEnvironment Environment { get; }
+        public IConfiguration Configuration { get; }
 
-        public Startup(IWebHostEnvironment environment)
+        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
             Environment = environment;
+            Configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var perkjamIdpDataDBConnectionString = "Server=(localdb)\\mssqllocaldb;Database=PerkjamIdpDataDB;Trusted_Connection=True;";
+            var perkjamIdpDataDbConnectionString = Configuration["ConnectionStrings:PerkjamDBConnectionString"];
             
             // uncomment, if you want to add an MVC-based UI
             services.AddControllersWithViews();
@@ -49,13 +49,13 @@ namespace Perkjam.IDP
             builder.AddConfigurationStore(options =>
             {
                 options.ConfigureDbContext = builder => 
-                    builder.UseSqlServer(perkjamIdpDataDBConnectionString,options => options.MigrationsAssembly(migrationsAssembly));
+                    builder.UseSqlServer(perkjamIdpDataDbConnectionString,options => options.MigrationsAssembly(migrationsAssembly));
             });
             
             builder.AddOperationalStore(options =>
             {
                 options.ConfigureDbContext = builder => 
-                    builder.UseSqlServer(perkjamIdpDataDBConnectionString,options => options.MigrationsAssembly(migrationsAssembly));
+                    builder.UseSqlServer(perkjamIdpDataDbConnectionString,options => options.MigrationsAssembly(migrationsAssembly));
             });
         }
 
@@ -66,7 +66,7 @@ namespace Perkjam.IDP
                 app.UseDeveloperExceptionPage();
             }
             
-            InitializeDatabase(app);
+            //InitializeDatabase(app);
 
             // uncomment if you want to add MVC
             app.UseStaticFiles();
