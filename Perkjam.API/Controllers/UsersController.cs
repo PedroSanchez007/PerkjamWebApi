@@ -31,7 +31,7 @@ namespace Perkjam.API.Controllers
                       throw new ArgumentNullException(nameof(mapper));
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet()]
         public IActionResult GetUsers()
         {
@@ -51,7 +51,7 @@ namespace Perkjam.API.Controllers
             }
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("{id:int}", Name = "GetUser")]
         public IActionResult GetUser(int id)
         {
@@ -68,7 +68,7 @@ namespace Perkjam.API.Controllers
             }
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost()]
         public IActionResult CreateUser([FromBody] UserForCreation userForCreation)
         {
@@ -101,7 +101,7 @@ namespace Perkjam.API.Controllers
             return BadRequest(ModelState);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPut("{id}")]
         public IActionResult UpdateUser(int id, UserForUpdate userForUpdate)
         {
@@ -128,7 +128,7 @@ namespace Perkjam.API.Controllers
             }
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
