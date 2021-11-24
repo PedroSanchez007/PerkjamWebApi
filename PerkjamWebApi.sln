@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perkjam.Model", "Perkjam.Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perkjam.IDP", "Perkjam.IDP\Perkjam.IDP.csproj", "{36E13877-A335-42D9-B914-745D7B98B147}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureAPIClient", "..\S03E01-Secure-.NET-Core-API\SecureAPIClient\SecureAPIClient.csproj", "{BC8A87D6-AFBD-4DB5-94C1-0D7A4805E2EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{36E13877-A335-42D9-B914-745D7B98B147}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36E13877-A335-42D9-B914-745D7B98B147}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36E13877-A335-42D9-B914-745D7B98B147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC8A87D6-AFBD-4DB5-94C1-0D7A4805E2EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC8A87D6-AFBD-4DB5-94C1-0D7A4805E2EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC8A87D6-AFBD-4DB5-94C1-0D7A4805E2EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC8A87D6-AFBD-4DB5-94C1-0D7A4805E2EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,4 @@
 using AutoMapper;
-using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Builder;
 using Perkjam.API.Entities;
 using Perkjam.API.Services;
@@ -9,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Perkjam.API
 {
@@ -27,15 +25,13 @@ namespace Perkjam.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
-                     .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
+            services.AddControllers();
 
-            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-                .AddIdentityServerAuthentication(options =>
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt =>
                 {
-                    options.Authority = "https://localhost:44318";
-                    options.ApiName = "perkjamapi";
-                    options.ApiSecret = "apisecret";
+                    opt.Audience = Configuration["AAD:ResourceId"];
+                    opt.Authority = $"{Configuration["AAD:Instance"]}{Configuration["AAD:TenantId"]}";
                 });
 
             // register the DbContext on the container, getting the connection string from
@@ -62,21 +58,18 @@ namespace Perkjam.API
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseExceptionHandler(appBuilder =>
-                {
-                    appBuilder.Run(async context =>
-                    {
-                        // ensure generic 500 status code on fault.
-                        context.Response.StatusCode = StatusCodes.Status500InternalServerError; ;
-                        await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
-                    });
-                });
-                // The default HSTS value is 30 days. You may want to change this for 
-                // production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+            // else
+            // {
+            //     app.UseExceptionHandler(appBuilder =>
+            //     {
+            //         appBuilder.Run(async context =>
+            //         {
+            //             // ensure generic 500 status code on fault.
+            //             context.Response.StatusCode = StatusCodes.Status500InternalServerError; ;
+            //             await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
+            //         });
+            //     });
+            // }
 
             app.UseHttpsRedirection();
 

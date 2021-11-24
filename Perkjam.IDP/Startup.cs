@@ -66,7 +66,7 @@ namespace Perkjam.IDP
                 app.UseDeveloperExceptionPage();
             }
             
-            //InitializeDatabase(app);
+            InitializeDatabase(app);
 
             // uncomment if you want to add MVC
             app.UseStaticFiles();
